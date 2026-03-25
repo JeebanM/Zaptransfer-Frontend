@@ -5,7 +5,7 @@ const nextConfig = {
   // Proxy API and WebSocket requests to the signaling server
   // This lets us use a SINGLE ngrok tunnel (for port 3000) that covers everything
   async rewrites() {
-    const signalingServer = process.env.SIGNALING_SERVER_INTERNAL || 'http://localhost:10000';
+    const signalingServer = process.env.SIGNALING_SERVER_INTERNAL || process.env.NEXT_PUBLIC_SIGNALING_SERVER || 'http://localhost:10000';
     return [
       {
         source: '/api/:path*',
