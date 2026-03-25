@@ -1,4 +1,4 @@
-import { File, Image, Film, Music, FileText, Download } from 'lucide-react';
+import { File, Image, Film, Music, FileText, Download, Eye } from 'lucide-react';
 
 const getFileIcon = (mimeType) => {
   if (!mimeType) return File;
@@ -54,15 +54,26 @@ export default function FileCard({ file, progress = null, downloadUrl = null, on
       </div>
 
       {/* Status / Download */}
-      <div className="flex-shrink-0">
+      <div className="flex flex-shrink-0 items-center space-x-2">
         {isComplete && downloadUrl && onDownload ? (
-          <button
-            onClick={() => onDownload(index)}
-            className="p-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-xl transition-colors"
-            title="Download"
-          >
-            <Download className="w-5 h-5" />
-          </button>
+          <>
+            <a
+              href={downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-xl transition-colors flex"
+              title="Preview File"
+            >
+              <Eye className="w-5 h-5" />
+            </a>
+            <button
+              onClick={() => onDownload(index)}
+              className="p-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-xl transition-colors"
+              title="Download"
+            >
+              <Download className="w-5 h-5" />
+            </button>
+          </>
         ) : progress !== null ? (
           <span className="text-xs font-mono text-slate-400">{Math.round(progress)}%</span>
         ) : (
