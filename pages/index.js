@@ -330,6 +330,7 @@ export default function HomePage() {
       <Head>
         <title>ZapTransfer — Secure QR File Sharing</title>
         <meta name="description" content="Upload files and share instantly via QR code. Secure P2P transfer." />
+        <meta name="google-site-verification" content="4Klq89JtcGdB5adRxgxwLPOiW_RpU_SnXrrbyHHoRAY" />
       </Head>
 
       {/* Header */}
