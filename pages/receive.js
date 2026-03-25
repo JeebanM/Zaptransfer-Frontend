@@ -6,7 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import FileCard from '@/components/FileCard';
 import ProgressBar from '@/components/ProgressBar';
-import { Download, Users, Zap, CheckCircle, UserPlus, PackageOpen } from 'lucide-react';
+import { Download, Users, Zap, CheckCircle, UserPlus, PackageOpen, Camera } from 'lucide-react';
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 import { createPeerConnection } from '@/utils/webrtc';
 import { SwarmManager } from '@/utils/swarmManager';
@@ -26,6 +27,7 @@ export default function ReceivePage() {
   const [overallProgress, setOverallProgress] = useState(0);
   const [speed, setSpeed] = useState('');
   const [eta, setEta] = useState('');
+  const [showScanner, setShowScanner] = useState(false);
 
   const socketRef = useRef(null);
   const connectionsRef = useRef(new Map());
@@ -457,6 +459,48 @@ export default function ReceivePage() {
             >
               Connect
             </button>
+
+            <button
+              onClick={() => setShowScanner(!showScanner)}
+              className="mt-4 ml-4 px-8 py-4 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-lg transition-all"
+            >
+              <Camera className="w-5 h-5 inline mr-2" />
+              Scan QR
+            </button>
+
+            {showScanner && (
+              <div className="mt-8 w-full max-w-xs mx-auto overflow-hidden rounded-2xl border-4 border-emerald-500/30 bg-black">
+                <Scanner 
+                  onScan={(result) => {
+                    const text = result?.[0]?.rawValue;
+                    if (text) {
+                      try {
+                        const url = new URL(text);
+                        const roomParam = url.searchParams.get('room');
+                        if (roomParam) {
+                          setRoomId(roomParam.toUpperCase());
+                          setShowScanner(false);
+                          joinRoom(roomParam.toUpperCase());
+                        }
+                      } catch (e) {
+                        if (text.length === 6) {
+                          setRoomId(text.toUpperCase());
+                          setShowScanner(false);
+                          joinRoom(text.toUpperCase());
+                        }
+                      }
+                    }
+                  }}
+                  onError={(error) => console.error(error)}
+                />
+                <button 
+                  onClick={() => setShowScanner(false)} 
+                  className="w-full py-3 bg-slate-900 border-t border-slate-800 text-red-400 font-bold hover:bg-slate-800"
+                >
+                  Cancel Scanner
+                </button>
+              </div>
+            )}
           </div>
         )}
 

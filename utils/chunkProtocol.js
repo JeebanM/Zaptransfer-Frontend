@@ -1,5 +1,5 @@
-// 1MB chunks for stable datachannel transfers
-export const CHUNK_SIZE = 1024 * 1024; 
+// 64KB chunks for stable datachannel transfers across restrictive NATs and maximum flight windows
+export const CHUNK_SIZE = 64 * 1024;
 
 /**
  * Encode a chunk with fileIndex and chunkIndex headers.

@@ -14,7 +14,7 @@ import { createPeerConnection, waitForDrain } from '@/utils/webrtc';
 import { CryptoUtils, MathUtils, CHUNK_SIZE, encodeChunk } from '@/utils/chunkProtocol';
 import { getToken, setToken, isLoggedIn, getUserInfo, logout, authFetch } from '@/utils/auth';
 
-const MAX_WINDOW = 32;
+const MAX_WINDOW = 256;
 const BACKPRESSURE_BYTES = 16 * 1024 * 1024;
 
 export default function HomePage() {
