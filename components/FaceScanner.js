@@ -119,92 +119,113 @@ export default function FaceScanner({ onDescriptorReady, onClose }) {
   }, [faceApi, onDescriptorReady]);
 
   return (
-    <div className="face-scanner-overlay" onClick={onClose}>
-      <div className="face-scanner-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-3xl animate-fade-in" onClick={onClose}>
+      <div className="relative w-full max-w-md bg-slate-900/60 backdrop-blur-2xl border border-slate-700/50 rounded-[3rem] p-8 shadow-2xl overflow-hidden ring-1 ring-white/10" onClick={(e) => e.stopPropagation()}>
+        
+        {/* Core Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-indigo-600/10 blur-[100px] rounded-full pointer-events-none"></div>
+
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="relative z-10 flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-500/15 rounded-xl flex items-center justify-center">
-              <ScanFace className="w-5 h-5 text-blue-400" />
+            <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20 shadow-inner">
+              <ScanFace className="w-6 h-6 text-indigo-400" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Find My Photos</h3>
-              <p className="text-xs text-slate-400">Position your face in the frame</p>
+              <h3 className="text-xl font-black text-white tracking-tight">AI Identity</h3>
+              <p className="text-xs text-indigo-300/70 font-medium uppercase tracking-widest">Neural Scanner</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-700/50 rounded-xl transition-colors">
-            <X className="w-5 h-5 text-slate-400" />
+          <button onClick={onClose} className="p-2.5 bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-full transition-all">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Video / Status */}
-        <div className="face-scanner-video-wrap">
-          {status === 'loading' && (
-            <div className="face-scanner-status">
-              <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
-              <p className="text-slate-300 mt-3">Loading face recognition...</p>
-            </div>
-          )}
+        {/* Video / Status Area */}
+        <div className="relative z-10 flex flex-col items-center">
+          
+          <div className="relative w-64 h-64 mb-8">
+            {/* The Circular Scanner Border */}
+            <div className={`absolute inset-[-8px] rounded-full border-[3px] border-dashed transition-all duration-700 ${
+              status === 'scanning' ? 'border-indigo-400 animate-[spin_6s_linear_infinite] shadow-[0_0_30px_rgba(99,102,241,0.4)]' : 
+              status === 'success' ? 'border-emerald-400 shadow-[0_0_40px_rgba(52,211,153,0.5)]' : 
+              'border-slate-700'
+            }`}></div>
 
-          {status === 'error' && (
-            <div className="face-scanner-status">
-              <div className="text-4xl mb-3">😕</div>
-              <p className="text-red-400 text-sm text-center">{errorMsg}</p>
-            </div>
-          )}
-
-          {(status === 'ready' || status === 'scanning' || status === 'success') && (
-            <>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="face-scanner-video"
-              />
-              {/* Face outline overlay */}
-              <div className={`face-scanner-frame ${status === 'scanning' ? 'scanning' : ''} ${status === 'success' ? 'success' : ''}`} />
-
-              {status === 'scanning' && (
-                <div className="face-scanner-scan-line" />
-              )}
-
-              {status === 'success' && (
-                <div className="face-scanner-status-overlay">
-                  <div className="text-5xl">✅</div>
-                  <p className="text-emerald-400 font-bold mt-2">Face Captured!</p>
+            {/* Inner Video Mask */}
+            <div className="relative w-full h-full rounded-full overflow-hidden bg-slate-950 shadow-inner ring-4 ring-slate-900">
+              
+              {status === 'loading' && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900">
+                  <Loader2 className="w-10 h-10 text-indigo-500 animate-spin mb-3" />
+                  <span className="text-[10px] uppercase tracking-widest text-indigo-400 font-black">Initializing...</span>
                 </div>
               )}
-            </>
-          )}
 
-          <canvas ref={canvasRef} className="hidden" />
-        </div>
+              {status === 'error' && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-950/30">
+                  <span className="text-4xl mb-2">⚠️</span>
+                  <span className="text-[10px] uppercase tracking-widest text-red-400 font-bold px-4 text-center">{errorMsg}</span>
+                </div>
+              )}
 
-        {/* Error message */}
-        {errorMsg && status === 'ready' && (
-          <p className="text-amber-400 text-sm text-center mt-3 animate-fade-in">{errorMsg}</p>
-        )}
+              {(status === 'ready' || status === 'scanning' || status === 'success') && (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`w-full h-full object-cover transition-all duration-1000 ${status === 'success' ? 'scale-110 brightness-110 sepia-[.2] hue-rotate-[-30deg]' : 'scale-100'}`}
+                  style={{ transform: 'scaleX(-1)' }} // Mirror webcam
+                />
+              )}
 
-        {/* Action button */}
-        {status === 'ready' && (
-          <button
-            onClick={handleScan}
-            className="w-full mt-4 py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-xl font-bold text-white transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-blue-600/20"
-          >
-            <Camera className="w-5 h-5" />
-            <span>Scan My Face</span>
-          </button>
-        )}
+              {/* Scanning Overlay Sweep */}
+              {status === 'scanning' && (
+                <div className="absolute inset-0 bg-indigo-500/20 z-20">
+                  <div className="w-full h-1 bg-indigo-400 shadow-[0_0_20px_4px_#818cf8] absolute left-0 animate-[shimmer_2s_infinite]"></div>
+                </div>
+              )}
 
-        {status === 'scanning' && (
-          <div className="w-full mt-4 py-3.5 bg-blue-600/30 rounded-xl text-center">
-            <div className="flex items-center justify-center space-x-2 text-blue-300">
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              <span className="font-medium">Analyzing...</span>
+              {/* Success Flash Overlay */}
+              {status === 'success' && (
+                <div className="absolute inset-0 flex items-center justify-center bg-emerald-500/30 backdrop-blur-sm z-30 animate-fade-in">
+                  <div className="w-16 h-16 bg-emerald-400 text-white rounded-full flex items-center justify-center shadow-[0_0_40px_#34d399] animate-bounce">
+                    <Check className="w-8 h-8 font-bold" />
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
-        )}
+
+          <canvas ref={canvasRef} className="hidden" />
+
+          {/* Action Trigger */}
+          <div className="w-full h-16 flex items-center justify-center">
+            {status === 'ready' ? (
+              <button
+                onClick={handleScan}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-2xl font-black text-white tracking-wide transition-all duration-300 shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:shadow-[0_0_40px_rgba(99,102,241,0.5)] flex items-center justify-center space-x-3"
+              >
+                <ScanFace className="w-5 h-5" />
+                <span>INITIATE SCAN</span>
+              </button>
+            ) : status === 'scanning' ? (
+              <div className="flex items-center space-x-3 text-indigo-400">
+                <RefreshCw className="w-5 h-5 animate-spin" />
+                <span className="font-black tracking-widest uppercase text-sm">Analyzing Facial Geometry...</span>
+              </div>
+            ) : status === 'success' ? (
+              <div className="flex items-center space-x-3 text-emerald-400">
+                <span className="font-black tracking-widest uppercase text-sm">Match Confirmed</span>
+              </div>
+            ) : (
+              <span className="text-slate-500 text-sm">{errorMsg || 'Awaiting Camera'}</span>
+            )}
+          </div>
+
+        </div>
       </div>
     </div>
   );
