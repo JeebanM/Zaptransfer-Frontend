@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 import FileCard from '@/components/FileCard';
 import ProgressBar from '@/components/ProgressBar';
-import { UploadCloud, Activity, LogOut, Zap, Users, LayoutDashboard } from 'lucide-react';
+import { UploadCloud, Activity, LogOut, Zap, Users, LayoutDashboard, Sparkles, Camera } from 'lucide-react';
 
 import { createPeerConnection, waitForDrain } from '@/utils/webrtc';
 import { CryptoUtils, MathUtils, CHUNK_SIZE, encodeChunk } from '@/utils/chunkProtocol';
@@ -326,41 +326,53 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center">
+    <div className="min-h-screen p-6 flex flex-col items-center bg-gradient-to-br from-slate-950 via-indigo-950/20 to-slate-950 relative overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+
       <Head>
-        <title>ZapTransfer — Secure QR File Sharing</title>
-        <meta name="description" content="Upload files and share instantly via QR code. Secure P2P transfer." />
+        <title>ZapTransfer AI — Premium Photos</title>
+        <meta name="description" content="Premium AI-powered photo sharing and P2P transfers." />
+        <meta name="google-site-verification" content="4Klq89JtcGdB5adRxgxwLPOiW_RpU_SnXrrbyHHoRAY" />
       </Head>
 
-      {/* Header */}
-      <div className="w-full max-w-5xl flex justify-between items-center py-6 mb-8 border-b border-slate-800">
-        <div className="flex items-center space-x-3">
-          <Zap className="w-6 h-6 text-blue-400" />
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
-            ZapTransfer
+      {/* Header - Glassmorphism */}
+      <div className="w-full max-w-7xl flex items-center justify-between p-4 bg-slate-900/40 backdrop-blur-2xl border border-slate-700/50 rounded-2xl shadow-xl z-10 mb-8 lg:mb-16">
+        <div className="flex items-center space-x-3 ml-2">
+          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-2xl font-black tracking-tight text-white">
+            ZapTransfer <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 font-bold">AI</span>
           </h1>
         </div>
-        <div className="flex items-center space-x-4">
+        
+        <div className="flex items-center space-x-4 mr-2">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center space-x-2 px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-xl text-sm font-medium transition-colors"
+            className="flex items-center space-x-2 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 rounded-xl text-sm font-bold transition-colors"
           >
             <LayoutDashboard className="w-4 h-4" />
-            <span className="hidden sm:inline">Photo Dashboard</span>
+            <span className="hidden sm:inline">Dashboard</span>
           </button>
           {activePeers > 0 && (
-            <div className="flex items-center space-x-2 text-sm">
-              <Users className="w-4 h-4 text-emerald-400 animate-pulse" />
-              <span className="text-emerald-400 font-medium">{activePeers} connected</span>
+            <div className="flex items-center space-x-2 text-sm bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span className="text-emerald-400 font-bold">{activePeers} connected</span>
             </div>
           )}
           {user && (
-            <div className="flex items-center space-x-3">
-              {user.avatar && (
-                <img src={user.avatar} alt="" className="w-8 h-8 rounded-full ring-2 ring-slate-700" />
+            <div className="flex items-center space-x-3 bg-slate-800/50 pl-2 pr-4 py-1.5 rounded-xl border border-slate-700/50">
+              {user.avatar ? (
+                <img src={user.avatar} alt="Profile" className="w-7 h-7 rounded-full ring-2 ring-indigo-500/50" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                  <span className="text-xs font-bold text-indigo-400">{user.name.charAt(0)}</span>
+                </div>
               )}
-              <span className="text-sm text-slate-300 hidden sm:inline">{user.name}</span>
-              <button onClick={logout} className="p-2 text-slate-400 hover:text-red-400 transition-colors" title="Logout">
+              <span className="text-sm font-medium text-slate-300 hidden sm:inline">{user.name.split(' ')[0]}</span>
+              <button onClick={logout} className="ml-2 text-slate-500 hover:text-red-400 transition-colors" title="Logout">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
@@ -368,8 +380,59 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="w-full max-w-3xl">
+      {/* Main Content - 2 Column Split */}
+      <main className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center z-10 pb-12">
+        
+        {/* Left Side: Hero Marketing */}
+        <div className="space-y-8 animate-fade-in-up">
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-indigo-500/10 to-emerald-500/10 border border-indigo-500/20 text-indigo-300 px-4 py-1.5 rounded-full text-sm font-bold shadow-lg">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <span>The Premium Photography Suite</span>
+          </div>
+          
+          <h2 className="text-5xl lg:text-7xl font-extrabold text-white leading-[1.1] tracking-tight">
+            Scan. Share. <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400">
+              Find your moments instantly.
+            </span>
+          </h2>
+          
+          <p className="text-xl text-slate-400 max-w-lg leading-relaxed font-medium">
+            AI-powered facial recognition galleries for professionals, and blazing fast end-to-end encrypted P2P sharing for everyone else.
+          </p>
+          
+          <div className="flex flex-wrap gap-4 pt-4">
+            <button
+               onClick={() => router.push('/dashboard')}
+               className="group px-8 py-4 bg-white hover:bg-slate-100 text-slate-900 rounded-2xl font-bold text-lg transition-all shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)] flex items-center space-x-3"
+            >
+               <Camera className="w-5 h-5 text-indigo-600 group-hover:scale-110 transition-transform" />
+               <span>Create Gallery</span>
+            </button>
+            <button
+               onClick={() => router.push('/receive')}
+               className="px-8 py-4 bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md border border-slate-700/50 text-white rounded-2xl font-bold text-lg transition-all hover:border-indigo-500/30"
+            >
+               Receive Files
+            </button>
+          </div>
+        </div>
+
+        {/* Right Side: Floating Glass Card (Quick P2P Transfer) */}
+        <div className="relative group animate-fade-in lg:mt-0 mt-8">
+           {/* Subtle Neon Glow behind card */}
+           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-500"></div>
+           
+           <div className="relative bg-slate-900/60 backdrop-blur-2xl border border-slate-700/50 rounded-[2rem] p-8 shadow-2xl min-h-[400px] flex flex-col justify-center">
+              <div className="absolute top-6 left-8 right-8 flex items-center justify-between mb-8">
+                 <h3 className="text-lg font-bold text-white flex items-center">
+                    <Zap className="w-5 h-5 text-indigo-400 mr-2" />
+                    Secure P2P Drop
+                 </h3>
+                 <span className="text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700">Encrypted</span>
+              </div>
+              
+              <div className="mt-12">
         {/* Upload Zone */}
         {status === 'waiting_for_files' && (
           <div className="glass-card rounded-3xl p-8 animate-fade-in">
@@ -427,6 +490,9 @@ export default function HomePage() {
             )}
           </div>
         )}
+              </div>
+           </div>
+        </div>
       </main>
     </div>
   );
