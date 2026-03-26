@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useDropzone } from 'react-dropzone';
 import QRCode from 'react-qr-code';
+import imageCompression from 'browser-image-compression';
 
 import EventCard from '@/components/EventCard';
 import ProgressBar from '@/components/ProgressBar';
@@ -114,38 +115,76 @@ export default function DashboardPage() {
     setUploadProgress(0);
     setUploadResult(null);
 
-    const batchSize = 10; // Upload in batches of 10
     let totalUploaded = 0;
-    let totalFaces = 0;
     let errors = [];
+    const uploadedFilesData = [];
 
-    for (let i = 0; i < uploadFiles.length; i += batchSize) {
-      const batch = uploadFiles.slice(i, i + batchSize);
-      const formData = new FormData();
-      batch.forEach(file => formData.append('photos', file));
+    try {
+      const token = getToken();
+      const base = process.env.NEXT_PUBLIC_SIGNALING_SERVER || '';
+      
+      // 1. Fetch Cloudinary Signature from Backend
+      const sigRes = await fetch(`${base}/api/events/${activeEvent.eventId}/photos/signature`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!sigRes.ok) throw new Error('Failed to obtain upload signature');
+      const { signature, timestamp, folder, cloudName, apiKey } = await sigRes.json();
 
-      try {
-        const token = getToken();
-        const base = process.env.NEXT_PUBLIC_SIGNALING_SERVER || '';
-        const res = await fetch(`${base}/api/events/${activeEvent.eventId}/photos`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` },
-          body: formData
-        });
-        const data = await res.json();
-        if (data.uploaded) {
-          totalUploaded += data.uploaded.length;
-          totalFaces += data.uploaded.reduce((s, p) => s + p.facesDetected, 0);
+      // 2. Compress & Upload each file directly from Edge to Cloudinary
+      for (let i = 0; i < uploadFiles.length; i++) {
+        const file = uploadFiles[i];
+        try {
+          // Native Worker Compression
+          const options = { maxSizeMB: 2, maxWidthOrHeight: 2500, useWebWorker: true };
+          const compressedFile = await imageCompression(file, options);
+
+          // Direct Signed Cloudinary Push
+          const formData = new FormData();
+          formData.append('file', compressedFile);
+          formData.append('api_key', apiKey);
+          formData.append('timestamp', timestamp);
+          formData.append('signature', signature);
+          formData.append('folder', folder);
+
+          const cRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!cRes.ok) throw new Error('Cloudinary secure upload rejected');
+          const cData = await cRes.json();
+
+          uploadedFilesData.push({
+            secure_url: cData.secure_url,
+            public_id: cData.public_id,
+            original_filename: file.name
+          });
+
+          totalUploaded++;
+          setUploadProgress(Math.round(((i + 1) / uploadFiles.length) * 100));
+        } catch (e) {
+          errors.push({ file: file.name, error: e.message });
         }
-        if (data.errors) errors = [...errors, ...data.errors];
-      } catch (e) {
-        errors.push({ file: 'batch', error: e.message });
       }
 
-      setUploadProgress(Math.round(((i + batch.length) / uploadFiles.length) * 100));
+      // 3. Dispatch validated Edge URLs to Backend to initiate Async Neural Face Extraction
+      if (uploadedFilesData.length > 0) {
+        setUploadProgress(100); 
+        await fetch(`${base}/api/events/${activeEvent.eventId}/photos/process`, {
+          method: 'POST',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ uploadedFiles: uploadedFilesData })
+        });
+      }
+
+    } catch (e) {
+      errors.push({ file: 'System', error: e.message });
     }
 
-    setUploadResult({ uploaded: totalUploaded, faces: totalFaces, errors });
+    setUploadResult({ uploaded: totalUploaded, faces: 'Processing Internally...', errors });
     setUploading(false);
     setUploadFiles([]);
     fetchEvents();

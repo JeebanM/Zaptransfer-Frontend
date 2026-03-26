@@ -91,7 +91,8 @@ export default function GalleryPage() {
     photos.forEach(p => {
       if (matchedIds.has(p.photoId)) {
         const a = document.createElement('a');
-        a.href = p.imageUrl;
+        const dlUrl = p.imageUrl.replace('/upload/', '/upload/fl_attachment/');
+        a.href = dlUrl;
         a.download = `zaptransfer_${p.photoId}.jpg`;
         a.target = '_blank';
         a.rel = 'noopener';

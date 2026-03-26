@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@yudiel/react-qr-scanner": "^2.5.1",
+    "browser-image-compression": "^2.0.2",
     "clsx": "^2.1.1",
     "face-api.js": "^0.22.2",
     "localforage": "^1.10.0",

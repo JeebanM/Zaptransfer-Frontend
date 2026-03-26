@@ -35,7 +35,11 @@ export default function Lightbox({ photos, currentIndex, onClose, onChange }) {
   const handleDownload = (e) => {
     e.stopPropagation();
     const a = document.createElement('a');
-    a.href = photo.imageUrl;
+    
+    // Cloudinary native download enforcement
+    const dlUrl = photo.imageUrl.replace('/upload/', '/upload/fl_attachment/');
+    
+    a.href = dlUrl;
     a.download = `zaptransfer_${photo.photoId}.jpg`;
     a.target = '_blank';
     a.rel = 'noopener';
