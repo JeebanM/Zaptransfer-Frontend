@@ -174,83 +174,120 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
+  const totalPhotos = events.reduce((sum, ev) => sum + (ev.photoCount || 0), 0);
+  const totalEvents = events.length;
+
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center">
+    <div className="min-h-screen p-4 md:p-8 flex flex-col items-center bg-gradient-to-br from-slate-950 via-[#1E1B4B] to-slate-950 relative overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-[20%] left-[-10%] w-[30%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+
       <Head>
-        <title>Dashboard — ZapTransfer</title>
-        <meta name="description" content="Photographer dashboard for managing wedding event photos" />
+        <title>Studio Dashboard — ZapTransfer AI</title>
+        <meta name="description" content="Professional photographer studio dashboard" />
       </Head>
 
       {/* Header */}
-      <div className="w-full max-w-5xl flex justify-between items-center py-6 mb-8 border-b border-slate-800">
+      <div className="w-full max-w-6xl flex justify-between items-center py-4 px-6 mb-10 bg-slate-900/40 backdrop-blur-2xl border border-slate-700/50 rounded-2xl shadow-xl z-10">
         <div className="flex items-center space-x-3">
-          <Zap className="w-6 h-6 text-blue-400" />
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
-            ZapTransfer
+          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-xl md:text-2xl font-black text-white tracking-tight">
+            ZapTransfer <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Studio</span>
           </h1>
-          <span className="text-xs bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20 font-medium">
-            Pro
+          <span className="hidden md:inline-flex text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-500/20 font-black uppercase tracking-widest ml-2">
+            Pro Plan
           </span>
         </div>
+        
         <div className="flex items-center space-x-3">
           {user && (
-            <>
-              {user.avatar && (
-                <img src={user.avatar} alt="" className="w-8 h-8 rounded-full ring-2 ring-slate-700" />
+            <div className="flex items-center space-x-3 bg-slate-800/50 pl-2 pr-4 py-1.5 rounded-xl border border-slate-700/50">
+              {user.avatar ? (
+                <img src={user.avatar} alt="" className="w-7 h-7 rounded-full ring-2 ring-indigo-500/50" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                  <span className="text-xs font-bold text-indigo-400">{user.name.charAt(0)}</span>
+                </div>
               )}
-              <span className="text-sm text-slate-300 hidden sm:inline">{user.name}</span>
-            </>
+              <span className="text-sm font-medium text-slate-300 hidden sm:inline">{user.name.split(' ')[0]}</span>
+              <button onClick={logout} className="ml-2 text-slate-500 hover:text-red-400 transition-colors" title="Logout">
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           )}
-          <button onClick={logout} className="p-2 text-slate-400 hover:text-red-400 transition-colors" title="Logout">
-            <LogOut className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="w-full max-w-3xl">
+      <main className="w-full max-w-6xl z-10">
 
         {/* ===== EVENTS LIST ===== */}
         {view === 'events' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between">
+          <div className="space-y-8 animate-fade-in-up">
+            
+            {/* STAT ROLLUPS */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-indigo-500/30 transition-colors">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <span className="text-slate-400 text-sm font-bold tracking-wide uppercase mb-2">Total Events</span>
+                <span className="text-4xl font-black text-white">{totalEvents}</span>
+              </div>
+              <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <span className="text-slate-400 text-sm font-bold tracking-wide uppercase mb-2">Total Photos</span>
+                <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">{totalPhotos}</span>
+              </div>
+              <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-purple-500/30 transition-colors">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <span className="text-slate-400 text-sm font-bold tracking-wide uppercase mb-2">Engaged Guests</span>
+                <span className="text-4xl font-black text-slate-500">--</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-4">
               <div>
-                <h2 className="text-2xl font-bold text-white">My Events</h2>
-                <p className="text-sm text-slate-400 mt-1">Create events and share photo galleries via QR</p>
+                <h2 className="text-2xl font-bold text-white">Project Galleries</h2>
+                <p className="text-sm text-slate-400 mt-1">Manage event albums and P2P distribution</p>
               </div>
               <button
                 onClick={() => setView('create')}
-                className="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-xl font-medium text-sm transition-all shadow-lg shadow-blue-600/20"
+                className="flex items-center space-x-2 px-6 py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-xl font-bold transition-all shadow-lg hover:shadow-indigo-500/20"
               >
-                <Plus className="w-4 h-4" />
-                <span>New Event</span>
+                <Plus className="w-5 h-5 text-indigo-600" />
+                <span className="hidden sm:inline">New Event Gallery</span>
+                <span className="sm:hidden">New</span>
               </button>
             </div>
 
             {events.length === 0 ? (
-              <div className="glass-card rounded-3xl p-12 text-center">
-                <Camera className="w-16 h-16 text-slate-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-slate-300 mb-2">No events yet</h3>
-                <p className="text-slate-400 text-sm mb-6">Create your first event to start uploading photos</p>
+              <div className="bg-slate-900/40 backdrop-blur-sm border border-slate-700/50 rounded-[2rem] p-16 text-center border-dashed">
+                <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 transform rotate-3">
+                  <Camera className="w-10 h-10 text-indigo-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-200 mb-3">No galleries yet</h3>
+                <p className="text-slate-400 max-w-sm mx-auto mb-8">Create your first event gallery, upload high-res photos, and share instantly with your clients.</p>
                 <button
                   onClick={() => setView('create')}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-medium transition-colors"
+                  className="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/20"
                 >
-                  Create Event
+                  Create First Gallery
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {events.map(ev => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {events.map((ev, i) => (
                   <EventCard
                     key={ev.eventId}
                     event={ev}
+                    index={i}
                     onOpen={openUpload}
                     onViewQR={openQR}
                     onDelete={handleDeleteEvent}
