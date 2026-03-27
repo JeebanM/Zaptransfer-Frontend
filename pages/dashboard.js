@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useDropzone } from 'react-dropzone';
 import QRCode from 'react-qr-code';
 import imageCompression from 'browser-image-compression';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import EventCard from '@/components/EventCard';
 import ProgressBar from '@/components/ProgressBar';
@@ -213,8 +214,11 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#030712]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
+          <span className="text-cyan-400 font-bold tracking-widest uppercase text-sm animate-pulse">Loading Studio...</span>
+        </div>
       </div>
     );
   }
@@ -223,9 +227,10 @@ export default function DashboardPage() {
   const totalEvents = events.length;
 
   return (
-    <div className="min-h-screen p-4 md:p-8 flex flex-col items-center bg-gradient-to-br from-slate-950 via-[#1E1B4B] to-slate-950 relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-[20%] left-[-10%] w-[30%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <div className="min-h-screen p-4 md:p-8 flex flex-col items-center bg-[#030712] relative overflow-hidden">
+      {/* Background Glows (Neon Dark) */}
+      <div className="absolute top-[20%] left-[-10%] w-[40%] h-[50%] bg-cyan-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[10%] right-[-10%] w-[30%] h-[40%] bg-fuchsia-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 
       <Head>
         <title>Studio Dashboard — ZapTransfer AI</title>
@@ -233,22 +238,27 @@ export default function DashboardPage() {
       </Head>
 
       {/* Header */}
-      <div className="w-full max-w-6xl flex justify-between items-center py-4 px-6 mb-10 bg-slate-900/40 backdrop-blur-2xl border border-slate-700/50 rounded-2xl shadow-xl z-10">
+      <motion.div 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", damping: 20 }}
+        className="w-full max-w-6xl flex justify-between items-center py-4 px-6 mb-10 bg-zinc-950/60 backdrop-blur-2xl border border-zinc-800/80 rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] z-10"
+      >
         <div className="flex items-center space-x-3">
-          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
-            <Zap className="w-5 h-5 text-white" />
+          <div className="bg-gradient-to-br from-cyan-400 to-blue-600 p-2 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+            <Zap className="w-5 h-5 text-zinc-950 fill-zinc-950" />
           </div>
           <h1 className="text-xl md:text-2xl font-black text-white tracking-tight">
-            ZapTransfer <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400">Studio</span>
+            ZapTransfer <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400">Studio</span>
           </h1>
-          <span className="hidden md:inline-flex text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-500/20 font-black uppercase tracking-widest ml-2">
+          <span className="hidden md:inline-flex text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-500/20 font-black uppercase tracking-widest ml-2 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
             Pro Plan
           </span>
         </div>
         
         <div className="flex items-center space-x-3">
           {user && (
-            <div className="flex items-center space-x-3 bg-slate-800/50 pl-2 pr-4 py-1.5 rounded-xl border border-slate-700/50">
+            <div className="flex items-center space-x-3 bg-zinc-900/80 pl-2 pr-4 py-1.5 rounded-2xl border border-zinc-800/80">
               {user.avatar ? (
                 <img src={user.avatar} alt="" className="w-7 h-7 rounded-full ring-2 ring-indigo-500/50" />
               ) : (
@@ -263,32 +273,40 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
-      <main className="w-full max-w-6xl z-10">
+      <main className="w-full max-w-6xl z-10 relative perspective-1000">
+        <AnimatePresence mode="wait">
 
         {/* ===== EVENTS LIST ===== */}
         {view === 'events' && (
-          <div className="space-y-8 animate-fade-in-up">
+          <motion.div 
+            key="events"
+            initial={{ opacity: 0, rotateX: -10, y: 20 }}
+            animate={{ opacity: 1, rotateX: 0, y: 0 }}
+            exit={{ opacity: 0, rotateX: 10, y: -20, filter: "blur(10px)" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="space-y-10"
+          >
             
             {/* STAT ROLLUPS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-indigo-500/30 transition-colors">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                <span className="text-slate-400 text-sm font-bold tracking-wide uppercase mb-2">Total Events</span>
-                <span className="text-4xl font-black text-white">{totalEvents}</span>
-              </div>
-              <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                <span className="text-slate-400 text-sm font-bold tracking-wide uppercase mb-2">Total Photos</span>
-                <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">{totalPhotos}</span>
-              </div>
-              <div className="bg-slate-900/60 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 flex flex-col relative overflow-hidden group hover:border-purple-500/30 transition-colors">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                <span className="text-slate-400 text-sm font-bold tracking-wide uppercase mb-2">Engaged Guests</span>
-                <span className="text-4xl font-black text-slate-500">--</span>
-              </div>
+              <motion.div whileHover={{ y: -5, scale: 1.02 }} className="bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 rounded-[2rem] p-6 flex flex-col relative overflow-hidden group hover:border-cyan-500/30 transition-colors shadow-lg">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-cyan-500/20 transition-colors"></div>
+                <span className="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-2">Total Events</span>
+                <span className="text-5xl font-black text-white">{totalEvents}</span>
+              </motion.div>
+              <motion.div whileHover={{ y: -5, scale: 1.02 }} className="bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 rounded-[2rem] p-6 flex flex-col relative overflow-hidden group hover:border-fuchsia-500/30 transition-colors shadow-lg">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-fuchsia-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-fuchsia-500/20 transition-colors"></div>
+                <span className="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-2">Total Photos</span>
+                <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-rose-400 drop-shadow-[0_0_15px_rgba(232,121,249,0.5)]">{totalPhotos}</span>
+              </motion.div>
+              <motion.div whileHover={{ y: -5, scale: 1.02 }} className="bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 rounded-[2rem] p-6 flex flex-col relative overflow-hidden group hover:border-emerald-500/30 transition-colors shadow-lg">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-colors"></div>
+                <span className="text-zinc-500 text-xs font-bold tracking-widest uppercase mb-2">Engaged Guests</span>
+                <span className="text-5xl font-black text-emerald-500/50">--</span>
+              </motion.div>
             </div>
 
             <div className="flex items-center justify-between pt-4">
@@ -334,12 +352,19 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* ===== CREATE EVENT ===== */}
         {view === 'create' && (
-          <div className="glass-card rounded-3xl p-8 animate-fade-in">
+          <motion.div 
+            key="create"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50, filter: "blur(10px)" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="bg-zinc-950/80 border border-zinc-800/80 shadow-[0_0_30px_rgba(34,211,238,0.1)] rounded-[2rem] p-8"
+          >
             <button
               onClick={() => setView('events')}
               className="flex items-center space-x-2 text-slate-400 hover:text-white text-sm mb-6 transition-colors"
@@ -391,12 +416,19 @@ export default function DashboardPage() {
                 Create Event
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* ===== UPLOAD PHOTOS ===== */}
         {view === 'upload' && activeEvent && (
-          <div className="space-y-6 animate-fade-in">
+          <motion.div 
+            key="upload"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50, filter: "blur(10px)" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="space-y-6"
+          >
             <button
               onClick={() => setView('events')}
               className="flex items-center space-x-2 text-slate-400 hover:text-white text-sm transition-colors"
@@ -405,25 +437,25 @@ export default function DashboardPage() {
               <span>Back to Events</span>
             </button>
 
-            <div className="glass-card rounded-3xl p-8">
+            <div className="bg-zinc-950/80 border border-zinc-800/80 shadow-[0_0_30px_rgba(16,185,129,0.1)] rounded-[2rem] p-8">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-white">{activeEvent.name}</h2>
-                  <p className="text-sm text-slate-400 mt-1">{activeEvent.photoCount} photos uploaded</p>
+                  <p className="text-sm text-zinc-500 font-bold uppercase tracking-widest mt-1">{activeEvent.photoCount} photos uploaded</p>
                 </div>
-                <div className="flex items-center space-x-1 bg-blue-500/10 px-4 py-2 rounded-full border border-blue-500/20">
-                  <Image className="w-4 h-4 text-blue-400" />
-                  <span className="font-bold text-blue-400">{activeEvent.photoCount}</span>
+                <div className="flex items-center space-x-1 bg-cyan-500/10 px-4 py-2 rounded-xl border border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.2)]">
+                  <Image className="w-4 h-4 text-cyan-400" />
+                  <span className="font-bold text-cyan-400">{activeEvent.photoCount}</span>
                 </div>
               </div>
 
               {/* Drop zone */}
               <div
                 {...getRootProps()}
-                className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 ${
+                className={`border-2 border-dashed rounded-[2rem] p-12 text-center cursor-pointer transition-all duration-300 ${
                   isDragActive
-                    ? 'border-blue-500 bg-blue-500/10 scale-[1.01]'
-                    : 'border-slate-600 hover:border-blue-400 hover:bg-slate-700/30'
+                    ? 'border-cyan-500 bg-cyan-500/10 scale-[1.02] shadow-[0_0_20px_rgba(34,211,238,0.2)]'
+                    : 'border-zinc-700 hover:border-cyan-400 hover:bg-zinc-900/50'
                 }`}
               >
                 <input {...getInputProps()} />
@@ -500,12 +532,19 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* ===== QR CODE ===== */}
         {view === 'qr' && qrEventId && (
-          <div className="glass-card rounded-3xl p-8 animate-fade-in">
+          <motion.div 
+            key="qr"
+            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: -30, filter: "blur(10px)" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="bg-zinc-950/80 border border-zinc-800/80 shadow-[0_0_30px_rgba(236,72,153,0.15)] rounded-[2rem] p-8"
+          >
             <button
               onClick={() => setView('events')}
               className="flex items-center space-x-2 text-slate-400 hover:text-white text-sm mb-6 transition-colors"
@@ -552,9 +591,10 @@ export default function DashboardPage() {
                 <p className="text-xs text-slate-500 font-mono truncate">{galleryUrl}</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
 
+        </AnimatePresence>
       </main>
     </div>
   );

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useDropzone } from 'react-dropzone';
 import { io } from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import QRCodeDisplay from '@/components/QRCodeDisplay';
 import FileCard from '@/components/FileCard';
@@ -319,17 +320,20 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#030712]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
+          <span className="text-cyan-400 font-bold tracking-widest uppercase text-sm animate-pulse">Initializing Protocol...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center bg-gradient-to-br from-slate-950 via-indigo-950/20 to-slate-950 relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <div className="min-h-screen p-6 flex flex-col items-center bg-[#030712] relative overflow-hidden">
+      {/* Background Glows (Neon Dark) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-600/10 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-fuchsia-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 
       <Head>
         <title>ZapTransfer AI — Premium Photos</title>
@@ -338,13 +342,18 @@ export default function HomePage() {
       </Head>
 
       {/* Header - Glassmorphism */}
-      <div className="w-full max-w-7xl flex items-center justify-between p-4 bg-slate-900/40 backdrop-blur-2xl border border-slate-700/50 rounded-2xl shadow-xl z-10 mb-8 lg:mb-16">
+      <motion.div 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", damping: 20 }}
+        className="w-full max-w-7xl flex items-center justify-between p-4 bg-zinc-950/60 backdrop-blur-2xl border border-zinc-800/80 rounded-[2rem] shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] z-10 mb-8 lg:mb-16"
+      >
         <div className="flex items-center space-x-3 ml-2">
-          <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
-            <Zap className="w-5 h-5 text-white" />
+          <div className="bg-gradient-to-br from-cyan-400 to-blue-600 p-2 rounded-xl shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+            <Zap className="w-5 h-5 text-zinc-950 fill-zinc-950" />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white">
-            ZapTransfer <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 font-bold">AI</span>
+            ZapTransfer <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-400 font-bold">AI</span>
           </h1>
         </div>
         
@@ -378,7 +387,7 @@ export default function HomePage() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content - 2 Column Split */}
       <main className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center z-10 pb-12">
@@ -419,59 +428,81 @@ export default function HomePage() {
         </div>
 
         {/* Right Side: Floating Glass Card (Quick P2P Transfer) */}
-        <div className="relative group animate-fade-in lg:mt-0 mt-8">
+        <div className="relative group lg:mt-0 mt-8">
            {/* Subtle Neon Glow behind card */}
-           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-500"></div>
+           <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-fuchsia-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-500"></div>
            
-           <div className="relative bg-slate-900/60 backdrop-blur-2xl border border-slate-700/50 rounded-[2rem] p-8 shadow-2xl min-h-[400px] flex flex-col justify-center">
+           <div className="relative bg-[#09090b]/80 backdrop-blur-2xl border border-zinc-800/80 rounded-[2rem] p-8 shadow-[0_20px_50px_-20px_rgba(34,211,238,0.3)] min-h-[400px] flex flex-col justify-center">
               <div className="absolute top-6 left-8 right-8 flex items-center justify-between mb-8">
                  <h3 className="text-lg font-bold text-white flex items-center">
-                    <Zap className="w-5 h-5 text-indigo-400 mr-2" />
+                    <Zap className="w-5 h-5 text-cyan-400 mr-2 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
                     Secure P2P Drop
                  </h3>
-                 <span className="text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700">Encrypted</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest bg-zinc-900 text-zinc-400 px-3 py-1.5 rounded-full border border-zinc-800 shadow-inner">Encrypted</span>
               </div>
               
-              <div className="mt-12">
+              <div className="mt-12 relative min-h-[250px]">
+                <AnimatePresence mode="wait">
         {/* Upload Zone */}
         {status === 'waiting_for_files' && (
-          <div className="glass-card rounded-3xl p-8 animate-fade-in">
-            <div {...getRootProps()} className={`border-2 border-dashed rounded-2xl p-16 text-center cursor-pointer transition-all duration-300 ${isDragActive ? 'border-blue-500 bg-blue-500/10 scale-[1.01]' : 'border-slate-600 hover:border-blue-400 hover:bg-slate-700/30'}`}>
+          <motion.div 
+            key="waiting"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="w-full"
+          >
+            <div {...getRootProps()} className={`border-2 border-dashed rounded-[2rem] p-16 text-center cursor-pointer transition-all duration-300 ${isDragActive ? 'border-cyan-500 bg-cyan-500/10 scale-[1.02] shadow-[0_0_20px_rgba(34,211,238,0.2)]' : 'border-zinc-700 hover:border-cyan-400 hover:bg-zinc-900/50'}`}>
               <input {...getInputProps()} />
-              <UploadCloud className="mx-auto w-20 h-20 text-slate-400 mb-6" />
-              <h2 className="text-3xl font-bold text-slate-200 mb-3">Drop your files here</h2>
-              <p className="text-slate-400 text-lg">Photos, videos, documents — anything, any size</p>
-              <p className="text-slate-500 text-sm mt-4">or click to browse</p>
+              <UploadCloud className="mx-auto w-20 h-20 text-zinc-500 mb-6 drop-shadow-md" />
+              <h2 className="text-3xl font-bold text-white mb-3">Drop files to send</h2>
+              <p className="text-zinc-400 text-lg">Photos, videos, or raw files</p>
+              <p className="text-zinc-[600] text-sm mt-4 tracking-widest uppercase">Click to browse</p>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Hashing */}
         {status === 'hashing' && (
-          <div className="glass-card rounded-3xl p-8 text-center animate-fade-in">
-            <div className="py-12 space-y-6">
-              <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <h3 className="text-2xl font-bold text-amber-400">Preparing files...</h3>
-              <p className="text-slate-400 text-sm max-w-sm mx-auto">Generating integrity hashes for {files.length} file{files.length > 1 ? 's' : ''}</p>
+          <motion.div 
+            key="hashing"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="bg-zinc-900/80 border border-zinc-800 rounded-[2rem] p-8 text-center"
+          >
+            <div className="py-12 space-y-6 flex flex-col items-center">
+              <div className="w-16 h-16 border-4 border-fuchsia-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(217,70,239,0.3)]"></div>
+              <h3 className="text-2xl font-bold text-fuchsia-400">Hashing Files...</h3>
+              <p className="text-zinc-500 text-sm max-w-sm tracking-wide">Generating cryptographic signatures for {files.length} file{files.length > 1 ? 's' : ''}</p>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Ready to Share / Transferring */}
         {(status === 'ready_to_share' || status === 'transferring') && (
-          <div className="space-y-6 animate-fade-in">
+          <motion.div 
+            key="sharing"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: "spring", damping: 20, stiffness: 100 }}
+            className="space-y-6"
+          >
             {/* QR Code Section */}
-            <div className="glass-card rounded-3xl p-8 flex flex-col items-center">
+            <div className="bg-zinc-900/80 border border-zinc-800 rounded-[2rem] p-8 flex flex-col items-center shadow-lg">
               <QRCodeDisplay url={receiveUrl} />
             </div>
 
             {/* File List */}
-            <div className="glass-card rounded-3xl p-6">
+            <div className="bg-zinc-900/80 border border-zinc-800 rounded-[2rem] p-6 shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-slate-200">
+                <h3 className="text-lg font-black text-white">
                   {files.length} File{files.length > 1 ? 's' : ''} Ready
                 </h3>
-                <span className="text-xs text-emerald-400 font-medium bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-500/10 px-3 py-1.5 rounded-full border border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.2)]">
                   Seeding
                 </span>
               </div>
@@ -484,12 +515,17 @@ export default function HomePage() {
 
             {/* Transfer Progress */}
             {status === 'transferring' && (
-              <div className="glass-card rounded-3xl p-6 animate-fade-in">
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="bg-zinc-900/80 border border-zinc-800 rounded-[2rem] p-6 shadow-lg"
+              >
                 <ProgressBar progress={Math.round(progress)} statusText={`Serving ${activePeers} peer${activePeers !== 1 ? 's' : ''}...`} />
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
+                </AnimatePresence>
               </div>
            </div>
         </div>
